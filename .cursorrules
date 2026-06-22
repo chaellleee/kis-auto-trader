@@ -1,0 +1,13 @@
+# KIS Auto Trader (레거시 .cursorrules — 주 규칙은 .cursor/rules/project.mdc)
+
+한국투자증권(KIS) Open API 기반 KOSPI+KOSDAQ 자동매매. 다중 팩터 모멘텀+퀄리티 전략.
+
+핵심 규칙:
+- 기본은 모의투자(paper). 실전(real) 기본값으로 바꾸지 말 것.
+- 자격증명은 env/.env.paper, env/.env.real 에만. 커밋 금지(.gitignore).
+- 주문 수정 시 --dry-run 경로 유지. TR_ID/도메인 모의·실전 분기(Trading._tr) 우회 금지.
+- 파라미터는 config/config.yaml 에서. 팩터 추가 시 가중치+계산+데이터없을때 자동비활성.
+- 주석/로그/docstring 한국어, 간결하게. Python 3.10+ 타입힌트, pandas 벡터연산.
+- 변경 후 검증: `PYTHONPATH=. python tests/test_strategy.py`, `python -m compileall -q src scripts tests`.
+
+투자 자문 아님. 백테스트가 미래수익 보장 안 함.

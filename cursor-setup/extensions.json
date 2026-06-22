@@ -1,0 +1,11 @@
+{
+  "// 사용법": "이 파일을 .vscode/extensions.json 으로 복사하면 Cursor 가 권장 확장 설치를 안내합니다.",
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "charliermarsh.ruff",
+    "tamasfe.even-better-toml",
+    "redhat.vscode-yaml"
+  ]
+}

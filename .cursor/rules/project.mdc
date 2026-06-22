@@ -1,0 +1,51 @@
+---
+description: KIS Auto Trader — 프로젝트 전반 규칙 (항상 적용)
+globs:
+alwaysApply: true
+---
+
+# KIS Auto Trader — 프로젝트 컨텍스트
+
+한국투자증권(KIS) Open API 기반 국내주식(KOSPI+KOSDAQ) 자동매매 시스템.
+**다중 팩터 모멘텀 + 퀄리티** 전략으로 시장(KOSPI) 대비 초과수익(알파)을 목표로 한다.
+
+## 아키텍처
+
+- `src/kis_api/` — KIS REST 래퍼. `KIS_MODE` 로 모의/실전 분기.
+  - `auth.py` 토큰 발급·캐싱 / hashkey
+  - `client.py` 공통 GET/POST·헤더·쓰로틀, 모드별 env 로드
+  - `quotations.py` 시세·일봉(FHKST01010100 / FHKST03010100)
+  - `trading.py` 주문/잔고 (매수 VTTC0802U|TTTC0802U, 매도 VTTC0801U|TTTC0801U, 잔고 VTTC8434R|TTTC8434R)
+- `src/data/` — `universe.py`(KOSPI/KOSDAQ 종목·일봉, pykrx 캐시), `fundamentals.py`(퀄리티 패널)
+- `src/strategy/` — `base.py` 추상 + `multifactor_momentum.py`(5팩터 z-score 결합 + 버퍼존)
+- `src/portfolio/manager.py` — 변동성 타게팅·비중상한·레짐필터·턴오버 상한
+- `src/backtest/engine.py` — 벡터화 백테스트 + 성과지표(CAGR/Sharpe/MDD/알파)
+- `scripts/` — `fetch_universe.py` → `run_backtest.py` → `run_paper_trading.py`
+- 파라미터는 코드가 아니라 `config/config.yaml` 에서 조정한다.
+
+## 절대 규칙 (안전)
+
+1. **기본은 모의투자(paper).** 실전(real) 코드를 추가할 때도 기본값은 절대 real 로 바꾸지 않는다.
+2. **자격증명을 코드/커밋에 넣지 않는다.** 키는 `env/.env.paper`, `env/.env.real` 에만. `.env*`(.example 제외)는 .gitignore 대상.
+3. 주문 로직을 수정하면 반드시 `--dry-run` 경로가 함께 동작해야 한다.
+4. TR_ID·도메인은 모의/실전이 다르다. `Trading._tr(real, paper)` 분기를 우회하지 말 것.
+
+## 코딩 컨벤션
+
+- Python 3.10+ 타입힌트 사용(`str | None` 등). pandas/numpy 벡터 연산 우선.
+- 주석·로그·docstring 은 한국어로 간결하게.
+- 외부 IO(pykrx, requests)는 실패해도 죽지 않게 try/except + 로깅, 빈 결과 폴백.
+- 전략에 팩터를 추가하면: `config.factor_weights` 에 가중치, `_factors()` 에 계산, 데이터 없으면 자동 비활성·재정규화.
+- 새 코드엔 `tests/test_strategy.py` 형식의 합성데이터 스모크 테스트를 추가한다(네트워크 불필요).
+
+## 검증 방법
+
+```bash
+PYTHONPATH=. python tests/test_strategy.py     # 스모크 테스트
+python -m compileall -q src scripts tests      # 문법 체크
+```
+실거래 의사결정 전에는 항상 `run_backtest` 로 벤치마크 대비 성과를 먼저 확인한다.
+
+## 면책
+
+투자 자문이 아니며 백테스트가 미래 수익을 보장하지 않는다. 손익 책임은 사용자에게 있다.

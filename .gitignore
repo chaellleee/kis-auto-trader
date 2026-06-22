@@ -1,0 +1,44 @@
+# --- 보안: API 키는 절대 커밋하지 말 것 ---
+.env
+env/.env.paper
+env/.env.real
+env/.env.*
+# 템플릿(.example)은 커밋 허용
+!env/.env.*.example
+*.key
+secrets/
+config/secrets.yaml
+
+# --- 토큰 캐시 ---
+.token_cache.json
+*.token
+
+# --- 데이터 캐시 ---
+data/cache/
+*.parquet
+*.pkl
+
+# --- 결과물 (원본은 비공개: 계좌번호 등 포함) ---
+results/
+*.png
+*.csv
+logs/
+*.log
+
+# --- 공개용 결과물(docs/)은 커밋 허용: 계좌번호 마스킹된 안전한 사본 ---
+!docs/
+!docs/*.png
+!docs/*.csv
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- OS / IDE ---
+.DS_Store
+.vscode/
+.idea/
